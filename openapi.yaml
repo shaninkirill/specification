@@ -1,0 +1,153 @@
+openapi: 3.0.0
+info:
+  title: OpenAPI спецификация блокировки платежей
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/api/v1
+  
+paths:
+  /client/block/{client_id}:
+    put:
+      summary: Метод блокировки платежей конкретного клиента
+      operationId: blockPayments  
+      tags:
+        - Clients
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          description: Идентификатор клиента
+          schema: 
+            type: integer
+      responses:
+          '200':
+            description: Подтверждение успешного обновления
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Client"
+          'default':
+            description: Любое нестандартное поведение
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Error"  
+  /client/unblock/{client_id}:
+    put:
+      summary: Метод разблокировки платежей конкретного клиента
+      operationId: unblockPayments  
+      tags:
+        - Clients
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          description: Подтверждение успешного обновления
+          schema: 
+            type: integer
+      responses:
+          '200':
+            description: Клиент
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Client"
+          'default':
+            description: Любое нестандартное поведение
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Error" 
+  /client/getIsBlocked/{client_id}:
+    get:
+      summary: Метод проверки блокировки конкретного клиента
+      operationId: checkIsBlocked  
+      tags:
+        - Clients
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          description: Идентификатор клиента
+          schema: 
+            type: integer
+      responses:
+          '200':
+            description: Блокировка клиента
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Client"
+          'default':
+            description: Любое нестандартное поведение
+            content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Error" 
+  /client/getIsCheater/{client_id}:
+    get:
+      summary: Метод отличия блокировки мошенника от блокировки добропорядочного клиента
+      operationId: checkIsCheater
+      tags:
+        - Cheaters
+      parameters:
+        - name: client_id
+          in: path
+          required: true
+          description: Идентификатор клиента
+          schema: 
+            type: integer
+      responses:
+        '200':
+          description: Подтверждение мошенника
+          content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Cheater"
+        'default':
+          description: Любое нестандартное поведение
+          content:
+              application/json;charset=UTF-8:
+                schema:
+                  $ref: "#/components/schemas/Error" 
+
+components:
+    schemas:
+      Client:
+        type: object
+        properties:
+          client_id:
+            type: integer
+            description: Идентификатор клиента
+          name:
+            type: string
+            description: ФИО клиента
+            example: Иванов Иван Иванович
+            default: null
+          payments:
+            type: number
+            description: Платежи
+            default: 0
+          isBlocked:
+            description: Статус блокировки клиента
+            type: boolean
+            default: false
+      Cheater:
+        type: object
+        properties:
+          cheater_id:
+            type: integer
+            description: Идентификатор мошенника
+          client_id:
+            type: integer
+            description: Идентификатор клиента, который является мошенником
+      Error:
+        type: object
+        required: 
+        - code
+        - message
+        properties:
+          code:
+            type: integer
+          message:
+            type: string
